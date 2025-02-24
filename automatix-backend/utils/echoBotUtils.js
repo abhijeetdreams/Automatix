@@ -1,12 +1,12 @@
 const { WebClient } = require('@slack/web-api');
 const slackClient = new WebClient(process.env.BOT_TOKEN);
 
-const sendMessageback = async (userId, message) => {
+const sendMessageback = async (userId, message, files = []) => {
     try {
-     if (!userId || !message) {
-               return;
-           } 
-      const openConversation = await slackClient.conversations.open({
+        if (!userId || !message) {
+            return;
+        }
+        const openConversation = await slackClient.conversations.open({
             users: userId,
             return_im: true
         });
@@ -17,7 +17,6 @@ const sendMessageback = async (userId, message) => {
 
         const dmChannelId = openConversation.channel.id;
 
-     
         let history = [];
         try {
             history = await slackClient.conversations.history({
@@ -36,6 +35,25 @@ const sendMessageback = async (userId, message) => {
         // Step 3: Send new message with thread awareness (if any)
         const threadTs = history.messages && history.messages.length > 0 ? history.messages[0].ts : undefined;
 
+        // Upload files if any
+        let uploadedFiles = [];
+        if (files && files.length > 0) {
+            for (const file of files) {
+                try {
+                    const result = await slackClient.files.upload({
+                        channels: dmChannelId,
+                        file: file.content,
+                        filename: file.name,
+                        initial_comment: "Here's the file you requested",
+                        thread_ts: threadTs
+                    });
+                    uploadedFiles.push(result.file);
+                } catch (fileError) {
+                    console.error("Error uploading file:", fileError);
+                }
+            }
+        }
+
         const result = await slackClient.chat.postMessage({
             channel: dmChannelId,
             text: message,
@@ -45,7 +63,6 @@ const sendMessageback = async (userId, message) => {
             reply_broadcast: true,
             thread_ts: threadTs // Attach to the last message in the thread (if any)
         });
-
 
         try {
             await slackClient.conversations.mark({

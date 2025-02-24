@@ -23,13 +23,22 @@ app.get("/api/slack/ping", (req, res, next) => {
 
 slackEvents.on("message", async (event) => {
   try {
-   if (event.thread_ts && !event.channel_type == "") {
-      const userMessages =  await Message.countDocuments({user :  event.user});
-       if (userMessages == 0) {
+    if (event.thread_ts && !event.channel_type == "") {
+      const userMessages = await Message.countDocuments({user: event.user});
+      if (userMessages == 0) {
         console.log("Ticket Created for the user  " + event.user);
       }
 
-      await sendMessageback(event.user , event.text);
+      // Handle files if present
+      let files = [];
+      if (event.files && event.files.length > 0) {
+        files = event.files.map(file => ({
+          name: file.name,
+          content: file.url_private
+        }));
+      }
+
+      await sendMessageback(event.user, event.text, files);
   
       const message = new Message({
         ...event,       
