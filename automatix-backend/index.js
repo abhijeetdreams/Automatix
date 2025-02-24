@@ -20,14 +20,13 @@ app.get("/api/slack/ping", (req, res, next) => {
 });
 
 slackEvents.on("message", async (event) => {
-  // console.log(`Received a message: ${event.text}`);
-  // console.log(event);
   
+  const  blocksLenght =  event.blocks.length;
   try {
     // Check if message already exists
-    const event =  event.blocks.length;
+    
 
-    if (event) {
+    if (blocksLenght) {
       const message = new Message({
         ...event,
         raw_event: event,
