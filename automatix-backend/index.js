@@ -5,7 +5,7 @@ const connectDB = require('./config/db');
 const slackRoutes = require('./routes/slackRoutes');
 const { createEventAdapter } = require("@slack/events-api");
 const Message = require('./models/Message');
-const { createSupportTicket } = require('./utils/ticketHelper');
+
 
 connectDB();
 
@@ -23,7 +23,10 @@ app.get("/api/slack/ping", (req, res, next) => {
 slackEvents.on("message", async (event) => {
   try {
    if (event.thread_ts && !event.channel_type == "") {
-      await createSupportTicket(event);
+      const userMessages = Message.countDocuments({user :  event.user});
+      if (userMessages.length  == 0) {
+        console.log("Ticket Created for the user  " + event.user);
+      }
       const message = new Message({
         ...event,       
         raw_event: event,  
