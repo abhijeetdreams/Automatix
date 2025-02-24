@@ -2,7 +2,7 @@ const User = require('../models/User');
 
 const checkUserExists = async (userId) => {
     const existingUser = await User.findOne({ slackUserId: userId });
-    return !!existingUser;
+    return existingUser;
 };
 
 const createSupportTicket = async (event) => {
