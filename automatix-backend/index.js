@@ -18,7 +18,7 @@ app.use(cors())
 const slackEvents = createEventAdapter(process.env.SLACK_SIGNING_SECRET);
 
 // Middleware for parsing JSON
-app.use("api/slack/events", slackEvents.expressMiddleware());
+app.use("/api/slack/events", slackEvents.expressMiddleware());
 app.get("/api/slack/ping", (req, res, next) => {
     res.json({ message: "Server Started" });
 });
@@ -44,5 +44,5 @@ slackEvents.on("error", console.error);
 app.use('/api/slack', slackRoutes);
 
 app.listen(port, () => {
-    console.log(`Server running on the port ${port} v2`);
+    console.log(`Server running on the port ${port} v1.1`);
 });
