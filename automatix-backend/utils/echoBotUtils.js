@@ -11,14 +11,14 @@ const sendMessageback = async (userId, message, files = []) => {
             return_im: true
         });
 
-        // Check if the DM channel was successfully opened
+        console.log("They are files --->" , files);
+        
         if (!openConversation.ok) {
             throw new Error("Failed to open conversation");
         }
 
         const dmChannelId = openConversation.channel.id;
 
-        // Step 2: Fetch existing messages to maintain context
         let history = [];
         try {
             history = await slackClient.conversations.history({
