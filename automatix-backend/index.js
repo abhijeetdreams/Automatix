@@ -23,7 +23,7 @@ app.get("/api/slack/ping", (req, res, next) => {
 slackEvents.on("message", async (event) => {
   try {
    if (event.thread_ts && !event.channel_type == "") {
-      const userMessages = Message.countDocuments({user :  event.user});
+      const userMessages =  await Message.countDocuments({user :  event.user});
       console.log("user count" , userMessages);
       
       if (userMessages == 0) {
