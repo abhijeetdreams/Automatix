@@ -13,9 +13,10 @@ const app = express()
 const port = process.env.PORT;
 
 
-app.use(cors())
+
 
 const slackEvents = createEventAdapter(process.env.SLACK_SIGNING_SECRET);
+app.use(cors())
 // console.log(slackEvents);
 
 // Middleware for parsing JSON
@@ -26,6 +27,8 @@ app.get("/api/slack/ping", (req, res, next) => {
 // Listen for message events
 slackEvents.on("message", async (event) => {
   console.log(`Received a message: ${event.text}`);
+  console.log(event);
+  
 });
 
 // Listen for reaction events
