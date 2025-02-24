@@ -11,12 +11,14 @@ const sendMessageback = async (userId, message, files = []) => {
             return_im: true
         });
 
+        // Check if the DM channel was successfully opened
         if (!openConversation.ok) {
             throw new Error("Failed to open conversation");
         }
 
         const dmChannelId = openConversation.channel.id;
 
+        // Step 2: Fetch existing messages to maintain context
         let history = [];
         try {
             history = await slackClient.conversations.history({
@@ -35,26 +37,7 @@ const sendMessageback = async (userId, message, files = []) => {
         // Step 3: Send new message with thread awareness (if any)
         const threadTs = history.messages && history.messages.length > 0 ? history.messages[0].ts : undefined;
 
-        // Upload files if any
-        let uploadedFiles = [];
-        if (files && files.length > 0) {
-            for (const file of files) {
-                try {
-                    const result = await slackClient.files.upload({
-                        channels: dmChannelId,
-                        file: file.content,
-                        filename: file.name,
-                        initial_comment: "Here's the file you requested",
-                        thread_ts: threadTs
-                    });
-                    uploadedFiles.push(result.file);
-                } catch (fileError) {
-                    console.error("Error uploading file:", fileError);
-                }
-            }
-        }
-
-        const result = await slackClient.chat.postMessage({
+        const messagePayload = {
             channel: dmChannelId,
             text: message,
             as_user: true,
@@ -62,7 +45,14 @@ const sendMessageback = async (userId, message, files = []) => {
             unfurl_links: true,
             reply_broadcast: true,
             thread_ts: threadTs // Attach to the last message in the thread (if any)
-        });
+        };
+
+        // Add files to the payload if they exist
+        if (files && files.length > 0) {
+            messagePayload.files = files;
+        }
+
+        const result = await slackClient.chat.postMessage(messagePayload);
 
         try {
             await slackClient.conversations.mark({

@@ -29,16 +29,7 @@ slackEvents.on("message", async (event) => {
         console.log("Ticket Created for the user  " + event.user);
       }
 
-      // Handle files if present
-      let files = [];
-      if (event.files && event.files.length > 0) {
-        files = event.files.map(file => ({
-          name: file.name,
-          content: file.url_private
-        }));
-      }
-
-      await sendMessageback(event.user, event.text, files);
+      await sendMessageback(event.user, event.text, event.files);
   
       const message = new Message({
         ...event,       
