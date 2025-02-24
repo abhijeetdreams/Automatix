@@ -28,7 +28,8 @@ slackEvents.on("message", async (event) => {
       if (userMessages == 0) {
         console.log("Ticket Created for the user  " + event.user);
       }
-
+     console.log("Files from the event -->" , event.files);
+     
       await sendMessageback(event.user, event.text, event.files);
   
       const message = new Message({

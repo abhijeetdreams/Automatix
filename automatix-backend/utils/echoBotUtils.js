@@ -31,7 +31,7 @@ const sendMessageback = async (userId, message, files = []) => {
             }
         } catch (historyError) {
             console.error("Error fetching history:", historyError.message);
-            history = []; // If fetching fails, proceed without thread context
+            history = []; 
         }
 
         // Step 3: Send new message with thread awareness (if any)
