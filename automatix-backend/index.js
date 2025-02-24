@@ -20,41 +20,19 @@ app.get("/api/slack/ping", (req, res, next) => {
 });
 
 slackEvents.on("message", async (event) => {
-  try {
-    if (event.thread_ts) {
-      const messageData = {
-        type: "message",
-        subtype: event.subtype || "",
-        text: event.text,
-        channel: event.channel,
-        channel_type: event.channel_type,
-        timestamp: event.ts,
-        event_ts: event.event_ts,
-        thread_ts: event.thread_ts,
-        raw_event: {
-          ...event,
-          root: event.thread_ts ? {
-            user: event.user,
-            type: "message",
-            ts: event.thread_ts,
-            text: event.text,
-            thread_ts: event.thread_ts,
-            blocks: event.blocks || [],
-            reply_count: event.reply_count,
-            reply_users_count: event.reply_users_count,
-            latest_reply: event.ts,
-            reply_users: event.reply_users || [],
-            is_locked: false
-          } : undefined
-        },
-        files: event.files || [],
-        reactions: event.reactions || []
-      };
 
-      const message = new Message(messageData);
+  try {
+    if (event.thread_ts && !event.channel_type == "") {
+      const message = new Message({
+        ...event,       
+        raw_event: event,  
+        timestamp: event.ts
+      });
+
       await message.save();
-      console.log('Complete message data saved to database');
     }
+  
+    console.log('Complete message data saved to database');
   } catch (error) {
     console.error('Error saving message:', error);
   }

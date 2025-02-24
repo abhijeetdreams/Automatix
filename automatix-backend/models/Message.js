@@ -1,61 +1,41 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-
-const messageSchema = new mongoose.Schema({
+const messageSchema = mongoose.Schema({
   type: String,
   subtype: String,
   text: String,
+  user: String,
+  team: String,
   channel: String,
   channel_type: String,
   timestamp: String,
   event_ts: String,
   thread_ts: String,
-  raw_event: {
-    subtype: String,
-    bot_id: String,
-    thread_ts: String,
-    root: {
-      user: String,
-      type: String,
-      ts: String,
-      bot_id: String,
-      app_id: String,
-      text: String,
-      team: String,
-      bot_profile: {
-        id: String,
-        deleted: Boolean,
-        name: String,
-        updated: Number,
-        app_id: String,
-        icons: {
-          image_36: String,
-          image_48: String,
-          image_72: String
-        },
-        team_id: String
-      },
-      thread_ts: String,
-      reply_count: Number,
-      reply_users_count: Number,
-      latest_reply: String,
-      reply_users: [String],
-      is_locked: Boolean,
-   
-    },
-    type: String,
-    ts: String,
-    app_id: String,
-    text: String,
-    channel: String,
-    event_ts: String,
-    channel_type: String
+  blocks: [{
+    type: { type: String },
+    block_id: String,
+    elements: mongoose.Schema.Types.Mixed
+  }],
+  files: [{
+    id: String,
+    name: String,
+    filetype: String,
+    url_private: String,
+    permalink: String,
+    mimetype: String,
+    size: Number
+  }],
+  edited: {
+    user: String,
+    ts: String
   },
-  files: Array,
-  reactions: Array,
-  user: String
-}, {
-  timestamps: true
-});
+  reactions: [{
+    name: String,
+    users: [String],
+    count: Number
+  }],
+  raw_event: mongoose.Schema.Types.Mixed // Store the complete raw event
+}, { timestamps: true });
 
-module.exports = mongoose.model('Message', messageSchema);
+
+module.exports = mongoose.model("Message", messageSchema);
