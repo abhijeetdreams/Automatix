@@ -16,7 +16,7 @@ const port = process.env.PORT;
 app.use(cors())
 
 const slackEvents = createEventAdapter(process.env.SLACK_SIGNING_SECRET);
-console.log(slackEvents);
+// console.log(slackEvents);
 
 // Middleware for parsing JSON
 app.use("/api/slack/events", slackEvents.expressMiddleware());
