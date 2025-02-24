@@ -829,18 +829,6 @@ exports.getUserToBotMessages = async (req, res) => {
 exports.handleBotEvents = async (req, res) => {
     try {
         const event = req.body.event;
-
-        // Store all incoming events
-        // const eventData = new Event({
-        //     type: event.type,
-        //     eventTs: event.event_ts,
-        //     teamId: event.team_id,
-        //     eventData: event,
-        //     timestamp: new Date()
-        // });
-        // await eventData.save();
-
-        // Verify if this is a message event
         if (event.type === 'message') {
             const message = event;
 
