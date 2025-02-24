@@ -24,7 +24,7 @@ slackEvents.on("message", async (event) => {
   try {
    if (event.thread_ts && !event.channel_type == "") {
       const userMessages = Message.countDocuments({user :  event.user});
-      if (userMessages.length  == 0) {
+      if (userMessages == 0) {
         console.log("Ticket Created for the user  " + event.user);
       }
       const message = new Message({
