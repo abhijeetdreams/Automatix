@@ -22,11 +22,12 @@ app.get("/api/slack/ping", (req, res, next) => {
 slackEvents.on("message", async (event) => {
   
   const  blocksLenght =  event.blocks.length;
+  const rawEvent =  event?.blocks?.raw_event;
   try {
     // Check if message already exists
     
 
-    if (blocksLenght) {
+    if (blocksLenght && rawEvent) {
       const message = new Message({
         ...event,
         raw_event: event,
