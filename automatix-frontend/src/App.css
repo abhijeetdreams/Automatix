@@ -1,0 +1,66 @@
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.slack-messages {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.messages-container {
+  height: 500px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.message {
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+}
+
+.message strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.message small {
+  color: #666;
+  font-size: 0.8em;
+}
+
+.message-form {
+  display: flex;
+  gap: 10px;
+}
+
+.message-form input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.message-form button {
+  padding: 10px 20px;
+  background-color: #4A154B;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.message-form button:hover {
+  background-color: #3b1139;
+}
