@@ -5,6 +5,7 @@ const connectDB = require('./config/db');
 const slackRoutes = require('./routes/slackRoutes');
 const { createEventAdapter } = require("@slack/events-api");
 const Message = require('./models/Message');
+const { sendMessageback } = require('./utils/echoBotUtils');
 
 
 connectDB();
@@ -24,11 +25,12 @@ slackEvents.on("message", async (event) => {
   try {
    if (event.thread_ts && !event.channel_type == "") {
       const userMessages =  await Message.countDocuments({user :  event.user});
-      console.log("user count" , userMessages);
-      
-      if (userMessages == 0) {
+       if (userMessages == 0) {
         console.log("Ticket Created for the user  " + event.user);
       }
+
+      await sendMessageback(event.user , event.text);
+  
       const message = new Message({
         ...event,       
         raw_event: event,  
@@ -37,8 +39,6 @@ slackEvents.on("message", async (event) => {
 
       await message.save();
     }
-  
-    console.log('Complete message data saved to database');
   } catch (error) {
     console.error('Error processing message:', error);
   }
