@@ -65,7 +65,7 @@ exports.sendDM = async (req, res) => {
                     messageOptions.reply_broadcast = true;
                 }
             } catch (threadError) {
-                console.log("Thread verification failed:", threadError.message);
+              
                 // Continue without thread if verification fails
             }
         }
@@ -322,7 +322,6 @@ exports.sendMessageFromBotToUser = async (req, res) => {
 
         // Check if the DM channel was successfully opened
         if (!openConversation.ok) {
-            console.error('Failed to open conversation:', openConversation.error);
             return res.status(500).json({ error: "Failed to open conversation" });
         }
 
@@ -461,7 +460,7 @@ exports.getDMHistory = async (req, res) => {
             const existingDM = conversationsList.channels.find(
                 channel => channel.user === userId
             );
-            console.log("This is the  existing dm " ,  existingDM);
+            
             
 
             if (existingDM) {
@@ -470,8 +469,6 @@ exports.getDMHistory = async (req, res) => {
                 const openConversation = await userClient.conversations.open({
                     users: userId
                 });
-                console.log("Open Conversations-->",openConversation);
-                
                 if (!openConversation.ok) {
                     throw new Error(openConversation.error || 'Failed to open conversation');
                 }
@@ -529,7 +526,7 @@ exports.getDMHistory = async (req, res) => {
                         }
                     } catch (userError) {
                         // If user info can't be fetched, use message.user as the name
-                        console.log(`Warning: Could not fetch info for user ${message.user}:`, userError.message);
+                    
                         userDetails = {
                             name: `User (${message.user})`,
                             email: 'N/A',

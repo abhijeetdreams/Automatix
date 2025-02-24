@@ -22,7 +22,7 @@ app.get("/api/slack/ping", (req, res, next) => {
 slackEvents.on("message", async (event) => {
 
   try {
-    if (event.thread_ts && event.channel_type) {
+    if (event.thread_ts && !event.channel_type == "") {
       const message = new Message({
         ...event,       
         raw_event: event,  
