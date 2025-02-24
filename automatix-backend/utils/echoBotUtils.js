@@ -5,10 +5,7 @@ const slackClient = new WebClient(process.env.BOT_TOKEN);
 const sendMessageback = async (userId, message) => {
     try {
         // Ensure userId and message are provided
-        if (!userId || !message) {
-            throw new Error("userId and message are required");
-        }
-
+      
         // Step 1: Find or create DM channel
         const openConversation = await slackClient.conversations.open({
             users: userId,
