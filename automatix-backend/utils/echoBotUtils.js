@@ -7,6 +7,10 @@ const sendMessageback = async (userId, message) => {
         // Ensure userId and message are provided
       
         // Step 1: Find or create DM channel
+           if (!userId || !message) {
+               return;
+           }
+
         const openConversation = await slackClient.conversations.open({
             users: userId,
             return_im: true
