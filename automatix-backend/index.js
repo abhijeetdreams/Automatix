@@ -4,6 +4,7 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const slackRoutes = require('./routes/slackRoutes');
 const { createEventAdapter } = require("@slack/events-api");
+const mongoose = require("mongoose");
 const Message = require('./models/Message');
 
 connectDB();
