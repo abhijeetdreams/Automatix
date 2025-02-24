@@ -12,10 +12,11 @@ connectDB();
 const app = express()
 const port = process.env.PORT;
 
-app.use(express.json());
+
 app.use(cors())
 
 const slackEvents = createEventAdapter(process.env.SLACK_SIGNING_SECRET);
+console.log(slackEvents);
 
 // Middleware for parsing JSON
 app.use("/api/slack/events", slackEvents.expressMiddleware());
@@ -38,9 +39,7 @@ slackEvents.on("error", console.error);
 
 
 
-
-
-
+app.use(express.json());
 app.use('/api/slack', slackRoutes);
 
 app.listen(port, () => {
