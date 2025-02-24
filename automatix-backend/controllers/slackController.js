@@ -334,7 +334,7 @@ exports.sendMessageFromBotToUser = async (req, res) => {
                 channel: dmChannelId,
                 limit: 100
             });
-            console.log(history);
+           
             
 
             if (!history.ok) {
@@ -401,7 +401,6 @@ exports.sendMessageFromBotToUser = async (req, res) => {
             channelId: dmChannelId,
             messageTs: result.ts,
             messageDetails: result.message,
-            threadHistory: history.messages,
             botUserId: botUserId
         });
 

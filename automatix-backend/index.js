@@ -5,6 +5,7 @@ const connectDB = require('./config/db');
 const slackRoutes = require('./routes/slackRoutes');
 const { createEventAdapter } = require("@slack/events-api");
 const Message = require('./models/Message');
+const { createSupportTicket } = require('./utils/ticketHelper');
 
 connectDB();
 
@@ -20,8 +21,12 @@ app.get("/api/slack/ping", (req, res, next) => {
 });
 
 slackEvents.on("message", async (event) => {
-
   try {
+    // Create support ticket for new messages (not in thread)
+    if (!event.thread_ts) {
+      await createSupportTicket(event);
+    }
+
     if (event.thread_ts && !event.channel_type == "") {
       const message = new Message({
         ...event,       
@@ -34,7 +39,7 @@ slackEvents.on("message", async (event) => {
   
     console.log('Complete message data saved to database');
   } catch (error) {
-    console.error('Error saving message:', error);
+    console.error('Error processing message:', error);
   }
 });
 
