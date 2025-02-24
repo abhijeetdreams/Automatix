@@ -22,12 +22,8 @@ app.get("/api/slack/ping", (req, res, next) => {
 
 slackEvents.on("message", async (event) => {
   try {
-    // Create support ticket for new messages (not in thread)
-    if (!event.thread_ts) {
+   if (event.thread_ts && !event.channel_type == "") {
       await createSupportTicket(event);
-    }
-
-    if (event.thread_ts && !event.channel_type == "") {
       const message = new Message({
         ...event,       
         raw_event: event,  
