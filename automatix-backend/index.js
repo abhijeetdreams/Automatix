@@ -20,19 +20,30 @@ app.get("/api/slack/ping", (req, res, next) => {
 });
 
 slackEvents.on("message", async (event) => {
-  console.log(`Received a message: ${event.text}`);
-  console.log(event);
+  // console.log(`Received a message: ${event.text}`);
+  // console.log(event);
   
   try {
-    const message = new Message({
-      ...event,       
-      raw_event: event,  
-      timestamp: event.ts
-    });
-    await message.save();
-    console.log('Complete message data saved to database');
+    // Check if message already exists
+    const event =  event.blocks.length;
+
+    if (event) {
+      const message = new Message({
+        ...event,
+        raw_event: event,
+        timestamp: event.ts
+      });
+      await message.save();
+      console.log('New message saved to database');
+    } else {
+      console.log('Duplicate message - skipped saving');
+    }
   } catch (error) {
-    console.error('Error saving message:', error);
+    if (error.code === 11000) {
+      console.log('Duplicate message - skipped saving');
+    } else {
+      console.error('Error saving message:', error);
+    }
   }
 });
 

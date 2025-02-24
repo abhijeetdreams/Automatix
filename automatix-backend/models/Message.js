@@ -37,4 +37,5 @@ const messageSchema = mongoose.Schema({
   raw_event: mongoose.Schema.Types.Mixed // Store the complete raw event
 }, { timestamps: true });
 
+
 module.exports = mongoose.model("Message", messageSchema);
