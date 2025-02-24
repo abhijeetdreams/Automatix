@@ -4,7 +4,6 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const slackRoutes = require('./routes/slackRoutes');
 const { createEventAdapter } = require("@slack/events-api");
-const mongoose = require("mongoose");
 const Message = require('./models/Message');
 
 connectDB();
@@ -32,10 +31,6 @@ slackEvents.on("message", async (event) => {
         timestamp: event.ts,
         event_ts: event.event_ts,
         thread_ts: event.thread_ts,
-        blocks: event.blocks ? event.blocks.map(block => ({
-          ...block,
-          _id: new mongoose.Types.ObjectId()
-        })) : [],
         raw_event: {
           ...event,
           root: event.thread_ts ? {

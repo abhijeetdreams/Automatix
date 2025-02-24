@@ -1,11 +1,5 @@
 const mongoose = require('mongoose');
 
-const blockSchema = new mongoose.Schema({
-  type: String,
-  block_id: String,
-  elements: Array,
-  _id: mongoose.Schema.Types.ObjectId
-}, { _id: false });
 
 const messageSchema = new mongoose.Schema({
   type: String,
@@ -16,7 +10,6 @@ const messageSchema = new mongoose.Schema({
   timestamp: String,
   event_ts: String,
   thread_ts: String,
-  blocks: [blockSchema],
   raw_event: {
     subtype: String,
     bot_id: String,
@@ -48,13 +41,12 @@ const messageSchema = new mongoose.Schema({
       latest_reply: String,
       reply_users: [String],
       is_locked: Boolean,
-      blocks: [blockSchema]
+   
     },
     type: String,
     ts: String,
     app_id: String,
     text: String,
-    blocks: [blockSchema],
     channel: String,
     event_ts: String,
     channel_type: String
