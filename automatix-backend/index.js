@@ -19,10 +19,9 @@ const slackEvents = createEventAdapter(process.env.SLACK_SIGNING_SECRET);
 
 // Middleware for parsing JSON
 app.use("api/slack/events", slackEvents.expressMiddleware());
-app.use("api/slack/ping"  , (req , res , next)=>{
-    res.json({message : "Server Started"});
-}
-)
+app.get("/api/slack/ping", (req, res, next) => {
+    res.json({ message: "Server Started" });
+});
 // Listen for message events
 slackEvents.on("message", async (event) => {
   console.log(`Received a message: ${event.text}`);
