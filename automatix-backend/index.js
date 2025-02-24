@@ -20,16 +20,22 @@ app.get("/api/slack/ping", (req, res, next) => {
 });
 
 slackEvents.on("message", async (event) => {
-  console.log(`Received a message: ${event.text}`);
-  console.log(event);
+  // console.log(`Received a message: ${event.text}`);
+  // console.log(event);
+
+
   
   try {
-    const message = new Message({
-      ...event,       
-      raw_event: event,  
-      timestamp: event.ts
-    });
-    await message.save();
+    if (event.thread_ts) {
+      const message = new Message({
+        ...event,       
+        raw_event: event,  
+        timestamp: event.ts
+      });
+
+      await message.save();
+    }
+  
     console.log('Complete message data saved to database');
   } catch (error) {
     console.error('Error saving message:', error);
