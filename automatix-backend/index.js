@@ -20,13 +20,9 @@ app.get("/api/slack/ping", (req, res, next) => {
 });
 
 slackEvents.on("message", async (event) => {
-  // console.log(`Received a message: ${event.text}`);
-  // console.log(event);
 
-
-  
   try {
-    if (event.thread_ts) {
+    if (event.thread_ts && event.channel_type) {
       const message = new Message({
         ...event,       
         raw_event: event,  
