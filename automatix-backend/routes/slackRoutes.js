@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const slackController = require('../controllers/slackController');
 
-router.get('/check-members', slackController.checkNewMembers);
+router.get('/check-members', slackController.checkNewWorkspaceMembers);
 router.post('/send-message', slackController.sendMessage);
 router.post("/send-dm" , slackController.sendDM);
 router.post('/send-message-bot',slackController.sendMessageFromUserToBot);

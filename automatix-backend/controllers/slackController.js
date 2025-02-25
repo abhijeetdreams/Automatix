@@ -169,10 +169,17 @@ async function storeMessage(message, userDetails, channelInfo = {}) {
     }
 }
 
-exports.checkNewMembers = async (req, res) => {
+
+exports.checkNewWorkspaceMembers = async (req, res) => {
     try {
-        const response = await slackClient.conversations.members({ channel: channelId });
-        const currentMembers = new Set(response.members);
+        // Fetch all members in the workspace
+        
+        const response = await slackClient.users.list();
+     
+        
+        const currentMembers = new Set(response.members.map(user => user.id));
+
+        // Find new members by comparing with previousMembers
         const newMembers = [...currentMembers].filter(member => !previousMembers.has(member));
         const newMemberDetails = [];
 
@@ -181,7 +188,7 @@ exports.checkNewMembers = async (req, res) => {
                 try {
                     const userInfo = await slackClient.users.info({ user: userId });
                     const user = userInfo.user;
-                    
+
                     // Store member in database
                     await Member.findOneAndUpdate(
                         { userId: user.id },
@@ -204,22 +211,20 @@ exports.checkNewMembers = async (req, res) => {
                     );
 
                     newMemberDetails.push({ id: userId, name: user.real_name || user.name });
-                    await slackClient.chat.postMessage({
-                        channel: channelId,
-                        text: `Welcome <@${userId}> to the channel! 🎉`
-                    });
+
                 } catch (userError) {
                     console.log(`Failed to fetch details for user ${userId}:`, userError.message);
                 }
             }
         }
 
-        previousMembers = currentMembers;
-        res.status(200).json({ message: 'Members checked successfully', newMembers: newMemberDetails });
+        previousMembers = currentMembers; // Update previous members
+        res.status(200).json({ message: 'Workspace members checked successfully', newMembers: newMemberDetails });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
+
 
 // Add new function to fetch all members
 exports.getAllMembers = async (req, res) => {
@@ -384,7 +389,6 @@ exports.sendMessageFromBotToUser = async (req, res) => {
             return res.status(500).json({ error: "Error saving message to database" });
         }
 
-        // Step 5: Mark the channel as read after sending the message
         try {
             await slackClient.conversations.mark({
                 channel: dmChannelId,
