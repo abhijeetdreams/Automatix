@@ -28,7 +28,7 @@ const createSupportTicket = async (event) => {
             status: 'new'
         };
         
-        // TODO: Replace with actual ticket creation API call
+        // TODO: Replace with actual ticket creation API 
         console.log('Support ticket created for new user:', ticketData);
         return ticketData;
     } catch (error) {

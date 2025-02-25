@@ -3,7 +3,7 @@ const slackClient = new WebClient(process.env.BOT_TOKEN);
 
 const sendMessageback = async (userId, message, files = []) => {
     try {
-        if (!userId || !message) {
+        if (!userId || !message ) {
             return;
         }
         const openConversation = await slackClient.conversations.open({
