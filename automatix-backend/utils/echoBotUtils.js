@@ -1,20 +1,19 @@
 const { WebClient } = require('@slack/web-api');
 const slackClient = new WebClient(process.env.BOT_TOKEN);
 
-const sendMessageback = async (userId, message, files = []) => {
-
-    console.log("They are files --->" , files);
+const sendMessageback = async (userId, message = "", files = []) => {
+    console.log("They are files --->", files);
     try {
-        if (!userId || !message ) {
+        if (!userId || (!message && files.length === 0)) {
+            console.log("No message or files to send.");
             return;
         }
+
         const openConversation = await slackClient.conversations.open({
             users: userId,
             return_im: true
         });
 
-
-        
         if (!openConversation.ok) {
             throw new Error("Failed to open conversation");
         }
@@ -29,30 +28,39 @@ const sendMessageback = async (userId, message, files = []) => {
             });
 
             if (!history.ok) {
-                throw new Error('Failed to retrieve message history');
+                throw new Error("Failed to retrieve message history");
             }
         } catch (historyError) {
             console.error("Error fetching history:", historyError.message);
-            history = []; 
+            history = [];
         }
 
-        // Step 3: Send new message with thread awareness (if any)
-        const threadTs = history.messages && history.messages.length > 0 ? history.messages[0].ts : undefined;
+        // Find thread timestamp if there's an existing conversation
+        const threadTs = history.messages?.length > 0 ? history.messages[0].ts : undefined;
+
+        // Construct message content
+        let fullMessage = message || ""; // If message is empty, initialize with empty string
+
+        if (files.length > 0) {
+            const fileLinksText = files.map(file => `<${file}|File>`).join("\n");
+            fullMessage += `\n\nAttached files:\n${fileLinksText}`;
+        }
+
+        // If there's nothing to send, return early
+        if (!fullMessage.trim()) {
+            console.log("No content to send.");
+            return;
+        }
 
         const messagePayload = {
             channel: dmChannelId,
-            text: message,
+            text: fullMessage,
             as_user: true,
             link_names: true,
             unfurl_links: true,
             reply_broadcast: true,
             thread_ts: threadTs // Attach to the last message in the thread (if any)
         };
-
-        // Add files to the payload if they exist
-        if (files && files.length > 0) {
-            messagePayload.files = files;
-        }
 
         const result = await slackClient.chat.postMessage(messagePayload);
 
@@ -69,7 +77,7 @@ const sendMessageback = async (userId, message, files = []) => {
         console.error("Error sending message from bot to user:", error);
         throw {
             error: error.message,
-            details: error.data || 'No additional details'
+            details: error.data || "No additional details"
         };
     }
 };
