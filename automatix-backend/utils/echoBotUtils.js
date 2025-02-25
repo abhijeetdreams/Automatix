@@ -41,7 +41,7 @@ async function uploadFiles(channelId, files, message, threadTs) {
                 channel_id: channelId,
                 file: fileData,
                 filename: file.name || file.title,
-                initial_comment: message || "hello",
+                initial_comment: message,
                 thread_ts: threadTs,
                 request_file_info: true
             });
@@ -86,7 +86,7 @@ async function sendMessageback(userId, message, files = []) {
         };
 
         
-      if (message) {
+      if (message && files.length==0) {
         const result = await slackClient.chat.postMessage(messagePayload);
         await slackClient.conversations.mark({
             channel: channelId,
@@ -94,16 +94,7 @@ async function sendMessageback(userId, message, files = []) {
         });
         
       }
-        
-        await uploadFiles(channelId, files, message, threadTs);
-
-        // try {
-            
-        // } catch (error) {
-        //     console.log("Mark channel error:", error.message);
-        // }
-
-        // return result;
+       await uploadFiles(channelId, files, message, threadTs);
 
     } catch (error) {
         throw handleSlackError(error);
