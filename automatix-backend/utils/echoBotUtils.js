@@ -53,6 +53,7 @@ const sendMessageback = async (userId, message, files = []) => {
 
         if (files && files.length > 0) {
               files.map( async(file)=>{
+                console.log("This is file" , file);
                 await slackClient.files.upload({
                     channels: dmChannelId,
                     file: fs.createReadStream(file.url_private),
