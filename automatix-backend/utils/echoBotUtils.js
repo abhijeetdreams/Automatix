@@ -21,13 +21,13 @@ async function uploadFiles(channelId, files, message, threadTs) {
         try {
             const fileSource = file.path 
                 ? fs.createReadStream(file.path)
-                : file.url_private_download;
+                : file.url_private;
 
             await slackClient.files.uploadV2({
                 channel_id: channelId,
                 file: fileSource,
                 filename: file.name || file.title,
-                initial_comment: message,
+                initial_comment: message ||"hello",
                 thread_ts: threadTs,
                 request_file_info: true
             });
@@ -89,7 +89,7 @@ async function sendMessageback(userId, message, files = []) {
         //     console.log("Mark channel error:", error.message);
         // }
 
-        return result;
+        // return result;
 
     } catch (error) {
         throw handleSlackError(error);
