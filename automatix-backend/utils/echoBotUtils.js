@@ -1,4 +1,5 @@
 const { WebClient } = require('@slack/web-api');
+const fs = require('fs');
 const slackClient = new WebClient(process.env.BOT_TOKEN);
 
 const sendMessageback = async (userId, message, files = []) => {
