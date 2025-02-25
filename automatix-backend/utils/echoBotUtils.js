@@ -47,20 +47,22 @@ const sendMessageback = async (userId, message, files = []) => {
         };
 
         const result = await slackClient.chat.postMessage(messagePayload);
-
+        console.log("They are files 1 -->" , files);
         if (files && files.length > 0) {
             console.log("They are files 2 -->" , files);
             
             for (const file of files) {
+                console.log("They are files 3 --->" , file)
                 try {
                     await slackClient.files.uploadV2({
                         channel_id: dmChannelId,
                         file: fs.createReadStream(file.path || file.url_private),
                         filename: file.name,
-                        initial_comment: message,
+                        initial_comment: message || "this is message",
                         thread_ts: result.ts,
                         request_file_info: true
                     });
+                    console.log("They are files 4--->" , file)
                 } catch (fileError) {
                     console.error("Error uploading file:", file.name, fileError);
                 }
