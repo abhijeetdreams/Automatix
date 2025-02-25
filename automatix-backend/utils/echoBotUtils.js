@@ -3,20 +3,16 @@ const fs = require('fs');
 const slackClient = new WebClient(process.env.BOT_TOKEN);
 
 const sendMessageback = async (userId, message, files = []) => {
-
     try {
-        if (!userId || !message ) {
+        if (!userId || !message) {
             return;
         }
+
         const openConversation = await slackClient.conversations.open({
             users: userId,
             return_im: true
         });
 
-     
-
-
-        
         if (!openConversation.ok) {
             throw new Error("Failed to open conversation");
         }
@@ -35,10 +31,9 @@ const sendMessageback = async (userId, message, files = []) => {
             }
         } catch (historyError) {
             console.error("Error fetching history:", historyError.message);
-            history = []; 
+            history = [];
         }
 
-        // Step 3: Send new message with thread awareness (if any)
         const threadTs = history.messages && history.messages.length > 0 ? history.messages[0].ts : undefined;
 
         const messagePayload = {
@@ -51,18 +46,24 @@ const sendMessageback = async (userId, message, files = []) => {
             thread_ts: threadTs 
         };
 
-        if (files && files.length > 0) {
-              files.map( async(file)=>{
-                console.log("This is file" , file);
-                  await slackClient.files.remote.add({
-                    external_url: file.url_private, 
-                    title: file.name,
-                    channels: dmChannelId
-                });
-              })
-        }
-
         const result = await slackClient.chat.postMessage(messagePayload);
+
+        if (files && files.length > 0) {
+            for (const file of files) {
+                try {
+                    await slackClient.files.uploadV2({
+                        channel_id: dmChannelId,
+                        file: fs.createReadStream(file.path || file.url_private),
+                        filename: file.name,
+                        initial_comment: message,
+                        thread_ts: result.ts,
+                        request_file_info: true
+                    });
+                } catch (fileError) {
+                    console.error("Error uploading file:", file.name, fileError);
+                }
+            }
+        }
 
         try {
             await slackClient.conversations.mark({
@@ -77,7 +78,8 @@ const sendMessageback = async (userId, message, files = []) => {
         console.error("Error sending message from bot to user:", error);
         throw {
             error: error.message,
-            details: error.data || 'No additional details'
+            details: error.data || 'No additional details',
+            status: error.code || 500
         };
     }
 };
