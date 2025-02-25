@@ -19,16 +19,20 @@ async function uploadFiles(channelId, files, message, threadTs) {
 
     for (const file of files) {
         try {
+            const fileSource = file.path 
+                ? fs.createReadStream(file.path)
+                : file.url_private_download;
+
             await slackClient.files.uploadV2({
                 channel_id: channelId,
-                file: fs.createReadStream(file.path || file.url_private),
-                filename: file.name,
-                initial_comment: "hello",
+                file: fileSource,
+                filename: file.name || file.title,
+                initial_comment: message,
                 thread_ts: threadTs,
                 request_file_info: true
             });
         } catch (error) {
-            console.error(`Error uploading file ${file.name}:`, error);
+            console.error(`Error uploading file ${file.name || file.title}:`, error);
         }
     }
 }
