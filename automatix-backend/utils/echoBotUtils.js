@@ -4,7 +4,6 @@ const slackClient = new WebClient(process.env.BOT_TOKEN);
 
 const sendMessageback = async (userId, message, files = []) => {
 
-    console.log("They are files --->" , files);
     try {
         if (!userId || !message ) {
             return;
@@ -55,12 +54,10 @@ const sendMessageback = async (userId, message, files = []) => {
         if (files && files.length > 0) {
               files.map( async(file)=>{
                 console.log("This is file" , file);
-                await slackClient.files.upload({
-                    channels: dmChannelId,
-                    file: fs.createReadStream(file.url_private),
-                    filename: file.name,
+                  await slackClient.files.remote.add({
+                    external_url: file.url_private, 
                     title: file.name,
-                    initial_comment: message
+                    channels: dmChannelId
                 });
               })
         }
