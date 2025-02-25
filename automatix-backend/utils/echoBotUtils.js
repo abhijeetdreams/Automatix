@@ -66,18 +66,23 @@ async function sendMessageback(userId, message, files = []) {
             thread_ts: threadTs
         };
 
+        let 
+      if (message) {
         const result = await slackClient.chat.postMessage(messagePayload);
+        await slackClient.conversations.mark({
+            channel: channelId,
+            ts: result.ts
+        });
+        
+      }
         
         await uploadFiles(channelId, files, message, threadTs);
 
-        try {
-            await slackClient.conversations.mark({
-                channel: channelId,
-                ts: result.ts
-            });
-        } catch (error) {
-            console.log("Mark channel error:", error.message);
-        }
+        // try {
+            
+        // } catch (error) {
+        //     console.log("Mark channel error:", error.message);
+        // }
 
         return result;
 
