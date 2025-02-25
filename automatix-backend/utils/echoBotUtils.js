@@ -51,7 +51,8 @@ async function getLatestThreadTs(channelId) {
 
 async function sendMessageback(userId, message, files = []) {
     // if (!userId && !message && files.length == 0 ) return;
-
+       console.log(message , files);
+       
     try {
         const channelId = await openDirectMessage(userId);
         const threadTs = await getLatestThreadTs(channelId);
@@ -66,7 +67,7 @@ async function sendMessageback(userId, message, files = []) {
             thread_ts: threadTs
         };
 
-        let 
+        
       if (message) {
         const result = await slackClient.chat.postMessage(messagePayload);
         await slackClient.conversations.mark({
