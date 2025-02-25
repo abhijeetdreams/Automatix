@@ -23,7 +23,7 @@ async function uploadFiles(channelId, files, message, threadTs) {
                 channel_id: channelId,
                 file: fs.createReadStream(file.path || file.url_private),
                 filename: file.name,
-                initial_comment: message,
+                initial_comment: "hello",
                 thread_ts: threadTs,
                 request_file_info: true
             });
