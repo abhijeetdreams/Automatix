@@ -1,94 +1,90 @@
 const { WebClient } = require('@slack/web-api');
 const fs = require('fs');
+const { handleSlackError } = require('./errorHandler');
+
 const slackClient = new WebClient(process.env.BOT_TOKEN);
 
-const sendMessageback = async (userId, message, files = []) => {
-    try {
-        if (!userId || !message ) {
-            return;
-        }
+async function openDirectMessage(userId) {
+    const conversation = await slackClient.conversations.open({
+        users: userId,
+        return_im: true
+    });
+    
+    if (!conversation.ok) throw new Error("Failed to open conversation");
+    return conversation.channel.id;
+}
 
-        const openConversation = await slackClient.conversations.open({
-            users: userId,
-            return_im: true
-        });
+async function uploadFiles(channelId, files, message, threadTs) {
+    if (!files?.length) return;
 
-        if (!openConversation.ok) {
-            throw new Error("Failed to open conversation");
-        }
-
-        const dmChannelId = openConversation.channel.id;
-        console.log("They are files 1 -->" , files);
-        if (files && files.length > 0) {
-            console.log("They are files 2 -->" , files);
-            
-            for (const file of files) {
-                console.log("They are files 3 --->" , file)
-                try {
-                    await slackClient.files.uploadV2({
-                        channel_id: dmChannelId,
-                        file: fs.createReadStream(file.path || file.url_private),
-                        filename: file.name,
-                        initial_comment: message || "this is message",
-                        thread_ts: result.ts,
-                        request_file_info: true
-                    });
-                    console.log("They are files 4--->" , file)
-                } catch (fileError) {
-                    console.error("Error uploading file:", file.name, fileError);
-                }
-            }
-        }
-
-        let history = [];
+    for (const file of files) {
         try {
-            history = await slackClient.conversations.history({
-                channel: dmChannelId,
-                limit: 100
+            await slackClient.files.uploadV2({
+                channel_id: channelId,
+                file: fs.createReadStream(file.path || file.url_private),
+                filename: file.name,
+                initial_comment: message,
+                thread_ts: threadTs,
+                request_file_info: true
             });
-
-            if (!history.ok) {
-                throw new Error('Failed to retrieve message history');
-            }
-        } catch (historyError) {
-            console.error("Error fetching history:", historyError.message);
-            history = [];
+        } catch (error) {
+            console.error(`Error uploading file ${file.name}:`, error);
         }
+    }
+}
 
-        const threadTs = history.messages && history.messages.length > 0 ? history.messages[0].ts : undefined;
+async function getLatestThreadTs(channelId) {
+    try {
+        const history = await slackClient.conversations.history({
+            channel: channelId,
+            limit: 1
+        });
+        
+        return history.ok && history.messages.length > 0 
+            ? history.messages[0].ts 
+            : undefined;
+    } catch (error) {
+        console.error("Error fetching history:", error.message);
+        return undefined;
+    }
+}
 
+async function sendMessageback(userId, message, files = []) {
+    // if (!userId && !message && files.length == 0 ) return;
+
+    try {
+        const channelId = await openDirectMessage(userId);
+        const threadTs = await getLatestThreadTs(channelId);
+        
         const messagePayload = {
-            channel: dmChannelId,
+            channel: channelId,
             text: message,
             as_user: true,
             link_names: true,
             unfurl_links: true,
             reply_broadcast: true,
-            thread_ts: threadTs 
+            thread_ts: threadTs
         };
 
         const result = await slackClient.chat.postMessage(messagePayload);
-    
         
+        await uploadFiles(channelId, files, message, result.ts);
 
         try {
             await slackClient.conversations.mark({
-                channel: dmChannelId,
+                channel: channelId,
                 ts: result.ts
             });
-        } catch (markError) {
-            console.log("Mark channel error:", markError.message);
+        } catch (error) {
+            console.log("Mark channel error:", error.message);
         }
 
+        return result;
+
     } catch (error) {
-        console.error("Error sending message from bot to user:", error);
-        throw {
-            error: error.message,
-            details: error.data || 'No additional details',
-            status: error.code || 500
-        };
+        throw handleSlackError(error);
     }
-};
+}
 
 module.exports = {
     sendMessageback
