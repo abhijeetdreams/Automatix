@@ -49,6 +49,8 @@ const sendMessageback = async (userId, message, files = []) => {
         const result = await slackClient.chat.postMessage(messagePayload);
 
         if (files && files.length > 0) {
+            console.log("They are files 2 -->" , files);
+            
             for (const file of files) {
                 try {
                     await slackClient.files.uploadV2({
