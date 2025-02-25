@@ -1,5 +1,6 @@
 const { WebClient } = require('@slack/web-api');
 const fs = require('fs');
+const axios = require('axios');
 const { handleSlackError } = require('./errorHandler');
 
 const slackClient = new WebClient(process.env.BOT_TOKEN);
@@ -19,15 +20,28 @@ async function uploadFiles(channelId, files, message, threadTs) {
 
     for (const file of files) {
         try {
-            const fileSource = file.path 
-                ? fs.createReadStream(file.path)
-                : file.url_private;
+            let fileData;
+            
+            if (file.path) {
+                fileData = fs.createReadStream(file.path);
+            } else if (file.url_private) {
+                const response = await axios.get(file.url_private, {
+                    headers: {
+                        'Authorization': `Bearer ${process.env.BOT_TOKEN}`
+                    },
+                    responseType: 'arraybuffer'
+                });
+                fileData = Buffer.from(response.data);
+            } else {
+                console.error(`Invalid file data for ${file.name || file.title}`);
+                continue;
+            }
 
             await slackClient.files.uploadV2({
                 channel_id: channelId,
-                file: fileSource,
+                file: fileData,
                 filename: file.name || file.title,
-                initial_comment: message ||"hello",
+                initial_comment: message || "hello",
                 thread_ts: threadTs,
                 request_file_info: true
             });
