@@ -68,7 +68,7 @@ async function sendMessageback(userId, message, files = []) {
 
         const result = await slackClient.chat.postMessage(messagePayload);
         
-        await uploadFiles(channelId, files, message, result.ts);
+        await uploadFiles(channelId, files, message, threadTs);
 
         try {
             await slackClient.conversations.mark({
