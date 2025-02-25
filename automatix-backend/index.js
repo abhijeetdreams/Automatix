@@ -30,7 +30,7 @@ slackEvents.on("message", async (event) => {
       }
      console.log("Files from the event -->" , event.files);
      
-      await sendMessageback(event.user, event.text, event.files || []);
+      await sendMessageback(event.user, event.text, event.files);
   
       const message = new Message({
         ...event,       
