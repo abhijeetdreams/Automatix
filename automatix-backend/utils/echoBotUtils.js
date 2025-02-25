@@ -2,6 +2,8 @@ const { WebClient } = require('@slack/web-api');
 const slackClient = new WebClient(process.env.BOT_TOKEN);
 
 const sendMessageback = async (userId, message, files = []) => {
+
+    console.log("They are files --->" , files);
     try {
         if (!userId || !message ) {
             return;
@@ -11,7 +13,7 @@ const sendMessageback = async (userId, message, files = []) => {
             return_im: true
         });
 
-        console.log("They are files --->" , files);
+
         
         if (!openConversation.ok) {
             throw new Error("Failed to open conversation");
