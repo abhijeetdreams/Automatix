@@ -886,10 +886,40 @@ exports.handleBotEvents = async (req, res) => {
     }
 };
 
-exports.getMessages = async(req , res )=>{
-    const message  = await Message.find();
-    res.json({data : message});
-}
+exports.getMessages = async (req, res) => {
+    try {
+        const messages = await Message.find();
+
+        // Fetch user information for each unique user ID
+        const userIds = [...new Set(messages.map(msg => msg.user))];
+        const userDetails = {};
+
+        for (const userId of userIds) {
+            try {
+                const userInfo = await slackClient.users.info({ user: userId });
+                userDetails[userId] = {
+                    name: userInfo.user.real_name || userInfo.user.name,
+                    email: userInfo.user.profile.email || "Email not available",
+                    avatar: userInfo.user.profile.image_original || ""
+                };
+            } catch (userError) {
+                console.log(`Failed to fetch details for user ${userId}:`, userError.message);
+                userDetails[userId] = { name: "Unknown", email: "N/A", avatar: "" };
+            }
+        }
+
+        // Attach user information to each message
+        const messagesWithUserDetails = messages.map(msg => ({
+            ...msg.toObject(),
+            userDetails: userDetails[msg.user] || { name: "Unknown", email: "N/A", avatar: "" }
+        }));
+
+        res.json({ data: messagesWithUserDetails });
+    } catch (error) {
+        console.error('Error fetching messages:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
 
 
 
