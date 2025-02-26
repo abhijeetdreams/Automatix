@@ -886,5 +886,10 @@ exports.handleBotEvents = async (req, res) => {
     }
 };
 
+exports.getMessages = async(req , res )=>{
+    const message  = await Message.find();
+    res.json({data : message});
+}
+
 
 

@@ -12,5 +12,8 @@ router.get('/members', slackController.getAllMembers);
 router.get('/dm-history/:userId', slackController.getDMHistory);
 router.post('/bot-events', slackController.handleBotEvents);
 router.get('/threads' , slackController.getThreadMessages);
+router.get('/messages' , slackController.getMessages);
+
+
 
 module.exports = router;
