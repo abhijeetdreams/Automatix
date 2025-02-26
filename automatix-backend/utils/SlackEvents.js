@@ -1,5 +1,5 @@
 const Message = require("../models/Message");
-const sendMessageback = require("../utils/echoBotUtils");
+const {sendMessageback} = require("../utils/echoBotUtils");
 
 const  slackEventsHandler = (slackEvents)=>{
     slackEvents.on("message", async (event) => {
