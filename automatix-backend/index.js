@@ -14,15 +14,41 @@ const app = express();
 const port = process.env.PORT;
 
 const SlackEventsHandler = async () => {
-  const slackBot = await Slackbot.findById("67c009608d1abbc2baee4f16");
-  const slackEvents = createEventAdapter(slackBot.signingSecret);
-  slackEventsHandler(slackEvents);
-  app.use(`/api/slack/events/${slackBot._id}`, slackEvents.expressMiddleware());
-  return slackBot;
+  try {
+    const slackBot = await Slackbot.findById("67c009608d1abbc2baee4f16");
+    
+    if (!slackBot) {
+      console.error('No active Slackbot configuration found');
+      return null;
+    }
+
+    if (!slackBot.signingSecret) {
+      console.error('Signing secret is missing in Slackbot configuration');
+      return null;
+    }
+
+    const slackEvents = createEventAdapter(slackBot.signingSecret);
+    
+    slackEventsHandler(slackEvents);
+    console.log(`Slack events endpoint configured: /api/slack/events/${slackBot._id}`);
+    
+    app.use(`/api/slack/events/${slackBot._id}`, slackEvents.expressMiddleware());
+    return slackBot;
+  } catch (error) {
+    console.error('Error setting up Slack Events Handler:', error);
+    return null;
+  }
 };
 
 (async () => {
-  await SlackEventsHandler();
+  try {
+    const bot = await SlackEventsHandler();
+    if (!bot) {
+      console.error('Failed to initialize Slack Events Handler');
+    }
+  } catch (error) {
+    console.error('Failed to start Slack Events Handler:', error);
+  }
 })();
 
 app.use(cors());
