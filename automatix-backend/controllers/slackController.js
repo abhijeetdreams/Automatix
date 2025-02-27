@@ -351,7 +351,7 @@ exports.sendMessageFromBotToUser = async (req, res) => {
         }
 
         // Step 3: Send new message with thread awareness (if any)
-        const threadTs = history.messages && history.messages.length > 0 ? history.messages[0].ts : undefined;
+   
 
      
 
@@ -394,6 +394,7 @@ exports.sendMessageFromBotToUser = async (req, res) => {
                 channel: dmChannelId,
                 ts: result.ts
             });
+            
         } catch (markError) {
             console.log("Mark channel error:", markError.message);
         }
