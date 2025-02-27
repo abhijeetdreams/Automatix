@@ -30,9 +30,9 @@ const SlackEventsHandler = async () => {
     const slackEvents = createEventAdapter(slackBot.signingSecret);
     
     slackEventsHandler(slackEvents);
-    console.log(`Slack events endpoint configured: /api/slack/events/${slackBot._id}`);
+    console.log(`Slack events endpoint configured: /api/${slackBot._id}`);
     
-    app.use(`/api/slack/events/${slackBot._id}`, slackEvents.expressMiddleware());
+    app.use(`/api/${slackBot._id}`, slackEvents.expressMiddleware());
     return slackBot;
   } catch (error) {
     console.error('Error setting up Slack Events Handler:', error);
