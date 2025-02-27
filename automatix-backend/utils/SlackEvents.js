@@ -3,6 +3,8 @@ const {sendMessageback} = require("../utils/echoBotUtils");
 
 const  slackEventsHandler = (slackEvents)=>{
     slackEvents.on("message", async (event) => {
+         console.log("This is new Message :" , event);
+         
         try {
           if (event.thread_ts && !event.channel_type == "") {
             const userMessages = await Message.countDocuments({user: event.user});
