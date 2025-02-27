@@ -3,24 +3,16 @@ const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
 const slackRoutes = require("./routes/slackRoutes");
-const slackEventsHandler = require("./utils/SlackEvents");
-const { createEventAdapter } = require("@slack/events-api");
 const router = require("./routes/SlackConfigRoute");
-const Slackbot = require("./models/slackbot");
+const setupSlackEvents = require("./utils/slackEventSetup");
 
 connectDB();
 
 const app = express();
 const port = process.env.PORT;
 
-const slackEvents = createEventAdapter(process.env.SLACK_SIGNING_SECRET);
-
-
-
-app.use(`/api/slack/events/${"67c009608d1abbc2baee4f16"}`, slackEvents.expressMiddleware());
-slackEventsHandler(slackEvents);
-
-
+// Setup Slack events
+setupSlackEvents(app, process.env.SLACK_SIGNING_SECRET, "67c009608d1abbc2baee4f16");
 
 app.use(cors());
 app.get("/api/slack/ping", (req, res, next) => {
