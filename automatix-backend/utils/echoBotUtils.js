@@ -1,6 +1,6 @@
 const { WebClient } = require('@slack/web-api');
 const fs = require('fs');
-const { handleSlackError } = require('./errorHandler');
+
 
 const slackClient = new WebClient(process.env.BOT_TOKEN);
 
@@ -16,6 +16,8 @@ async function openDirectMessage(userId) {
 
 async function uploadFiles(channelId, files, message, threadTs) {
     if (!files?.length) return;
+
+    
 
     for (const file of files) {
         try {
@@ -95,7 +97,7 @@ async function sendMessageback(userId, message, files = []) {
        await uploadFiles(channelId, files, message, threadTs);
 
     } catch (error) {
-        throw handleSlackError(error);
+        throw  new Error(error);
     }
 }
 
