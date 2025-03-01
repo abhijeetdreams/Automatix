@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
     },
     firstInteraction: {
         type: Date,
-        default: Date.now
+        default: Date.now 
     }
 });
 
