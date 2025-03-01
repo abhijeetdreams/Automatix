@@ -17,7 +17,7 @@ router.get('/dm-history/:userId', slackController.getDMHistory);
 router.post('/bot-events', slackController.handleBotEvents);
 router.get('/threads' , slackController.getThreadMessages);
 router.get('/messages' , slackController.getMessages);
-router.get("/api/auth/slack/callback", async (req, res) => {
+router.get("/callback", async (req, res) => {
     const { code } = req.query;
     if (!code) return res.status(400).send("Authorization code not found");
 
