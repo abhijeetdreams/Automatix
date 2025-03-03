@@ -18,7 +18,7 @@ const slackbotSchema = new mongoose.Schema({
   },
   signingSecret: {
     type: String,
-    required: [true, "Signing secret is required"],
+    required: [true, "Signing secret  is required"],
     trim: true,
   },
   eventUrl : {
